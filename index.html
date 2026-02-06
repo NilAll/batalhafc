@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FutBet Pro - Full Ranking</title>
+    <title>FutBet Pro - Importação Garantida</title>
     <style>
         :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #238636; --text: #f0f6fc; --gold: #d29922; }
         body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; display: flex; justify-content: center; }
@@ -21,8 +21,6 @@
         .info-btn { background: #30363d; width: 18px; height: 18px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-size: 10px; cursor: pointer; margin-left: 5px; }
         .tooltip { background: #eee; color: #111; padding: 10px; border-radius: 5px; position: absolute; z-index: 100; width: 200px; font-size: 0.7rem; right: 0; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .info-btn:hover + .tooltip { display: block; }
-        .user-row { border-bottom: 1px solid #333; padding: 10px 0; }
-        .btn-small { padding: 5px; font-size: 0.7rem; width: auto; margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -31,12 +29,14 @@
     <div id="view-login" onkeydown="if(event.keyCode==13) login()">
         <div class="card" style="text-align: center; margin-top: 50px;">
             <h1 style="color: var(--accent);">🏟️ FutBet</h1>
-            <p style="font-size: 0.8rem;">Selecione o arquivo <b>Data.json</b></p>
-            <input type="file" id="import-master" onchange="autoLoadMasterFile(this)">
+            <p style="font-size: 0.8rem; color: var(--gold);">1. Selecione o arquivo <b>Data.json</b></p>
+            <input type="file" id="import-master" accept=".json">
+            <button onclick="manualLoadMaster()" style="background: #30363d; margin-top: 0;">📥 CARREGAR DADOS DO SISTEMA</button>
             <hr style="border:0.5px solid var(--border); margin:15px 0;">
+            <p style="font-size: 0.8rem;">2. Insira suas credenciais</p>
             <input type="text" id="user" placeholder="Usuário">
             <input type="password" id="pass" placeholder="Senha">
-            <button onclick="login()">Entrar</button>
+            <button onclick="login()">ENTRAR NO JOGO</button>
         </div>
     </div>
 
@@ -47,31 +47,17 @@
             <div class="card">
                 <h3 id="m-title" style="text-align:center;">Sem Jogo</h3>
                 <p id="m-time" style="text-align:center; font-size:0.8rem; color:var(--gold);"></p>
-                
                 <label>Vencedor:</label>
                 <select id="p-vencedor"><option value="A">Time A</option><option value="B">Time B</option><option value="Empate">Empate</option></select>
                 <label>Ambos Marcam:</label>
                 <select id="p-ambos"><option value="Sim">Sim</option><option value="Não">Não</option></select>
-                
                 <label>Gols:</label>
-                <select id="p-gols">
-                    <option value="0.5">+0.5 (0.1)</option><option value="1.5">+1.5 (0.3)</option><option value="3.5">+3.5 (1.0)</option>
-                    <option value="-0.5">-0.5 (1.0)</option><option value="-1.5">-1.5 (0.5)</option><option value="-2.5">-2.5 (0.3)</option>
-                </select>
-
+                <select id="p-gols"><option value="0.5">+0.5</option><option value="1.5">+1.5</option><option value="3.5">+3.5</option><option value="-0.5">-0.5</option><option value="-2.5">-2.5</option></select>
                 <label>Escanteios:</label>
-                <select id="p-esc">
-                    <option value="4.5">+4.5 (0.1)</option><option value="10.5">+10.5 (1.0)</option>
-                    <option value="-4.5">-4.5 (1.0)</option><option value="-10.5">-10.5 (0.1)</option>
-                </select>
-
+                <select id="p-esc"><option value="4.5">+4.5</option><option value="10.5">+10.5</option><option value="-4.5">-4.5</option><option value="-10.5">-10.5</option></select>
                 <label>Cartões:</label>
-                <select id="p-car">
-                    <option value="1.5">+1.5 (0.1)</option><option value="5.5">+5.5 (1.0)</option>
-                    <option value="-1.5">-1.5 (1.0)</option><option value="-5.5">-5.5 (0.1)</option>
-                </select>
-
-                <button id="btn-export-palpite" onclick="exportPalpite()">Exportar Palpite (JSON)</button>
+                <select id="p-car"><option value="1.5">+1.5</option><option value="5.5">+5.5</option><option value="-1.5">-1.5</option><option value="-5.5">-5.5</option></select>
+                <button onclick="exportPalpite()">EXPORTAR MEU PALPITE (JSON)</button>
             </div>
         </div>
 
@@ -84,43 +70,36 @@
 
         <div id="tab-admin" class="hidden">
             <div class="card" style="border: 1px solid var(--gold);">
-                <button onclick="exportMasterFile()" style="background: var(--gold); color: #000;">Baixar DATA.JSON Atualizado</button>
+                <button onclick="exportMasterFile()" style="background: var(--gold); color: #000;">💾 BAIXAR DATA.JSON ATUALIZADO</button>
             </div>
-
             <div class="card">
-                <h3>1. Configurar Próximo Jogo</h3>
+                <h3>1. Configurar Jogo</h3>
                 <input type="text" id="adm-a" placeholder="Time A">
                 <input type="text" id="adm-b" placeholder="Time B">
                 <input type="datetime-local" id="adm-date">
-                <button onclick="updateMatchLocal()">Publicar Jogo</button>
-                <details><summary style="cursor:pointer; font-size:0.8rem; color:var(--gold);">Histórico de Jogos</summary><div id="history-list"></div></details>
+                <button onclick="updateMatchLocal()">PUBLICAR JOGO</button>
+                <details><summary style="cursor:pointer; color:var(--gold);">Histórico</summary><div id="history-list"></div></details>
             </div>
-
             <div class="card" style="border: 1px solid var(--accent);">
                 <h3>2. Processar Rodada</h3>
-                <p id="admin-match-now" style="color:var(--gold); font-weight:bold; font-size:0.9rem;"></p>
+                <p id="admin-match-now" style="color:var(--gold); font-weight:bold;"></p>
                 <input type="file" id="f-p-in" multiple>
-                <button onclick="inserirDados()" style="background:#30363d">Adicionar Palpite(s)</button>
+                <button onclick="inserirDados()" style="background:#30363d">ADICIONAR PALPITE(S)</button>
                 <div id="p-conf" style="margin:10px 0; font-size:0.7rem;"></div>
-                
                 <hr style="border:0.5px solid var(--border)">
-                <label>Vencedor Real:</label>
+                <label>Resultado Real:</label>
                 <select id="res-v"><option value="A">Time A</option><option value="B">Time B</option><option value="Empate">Empate</option></select>
-                <label>Ambos Marcam Real:</label>
                 <select id="res-a"><option value="Sim">Sim</option><option value="Não">Não</option></select>
-                <label>Resultados Numéricos:</label>
-                <input type="number" id="res-g" placeholder="Total Gols">
-                <input type="number" id="res-e" placeholder="Total Escanteios">
-                <input type="number" id="res-c" placeholder="Total Cartões">
-                <button onclick="processarRankingLocal()">Gerar Novo Ranking</button>
+                <input type="number" id="res-g" placeholder="Gols">
+                <input type="number" id="res-e" placeholder="Escanteios">
+                <input type="number" id="res-c" placeholder="Cartões">
+                <button onclick="processarRankingLocal()">GERAR NOVO RANKING</button>
             </div>
-
             <div class="card">
-                <h3>3. Gerenciar Jogadores</h3>
+                <h3>3. Jogadores</h3>
                 <input type="text" id="n-u" placeholder="Nome"><input type="text" id="n-p" placeholder="Senha"><input type="text" id="n-i" placeholder="URL Foto">
-                <button onclick="addUser()">Cadastrar Novo</button>
+                <button onclick="addUser()">CADASTRAR JOGADOR</button>
                 <div id="user-manage-list"></div>
-                <button onclick="resetSystem()" style="background:#511; margin-top:30px; font-size:0.7rem;">RESETAR TUDO</button>
             </div>
         </div>
     </div>
@@ -130,17 +109,27 @@
     let masterData = { users: [], match: { a: "", b: "", date: "" }, ranking: [], history: [] };
     let currentUser = null, tempPlayers = [];
 
-    if(localStorage.getItem('futbet_master')) masterData = JSON.parse(localStorage.getItem('futbet_master'));
+    // Tenta carregar automaticamente se houver mudança no arquivo
+    document.getElementById('import-master').addEventListener('change', function() {
+        manualLoadMaster();
+    });
 
-    function autoLoadMasterFile(input) {
-        const file = input.files[0];
-        if(!file) return;
+    function manualLoadMaster() {
+        const fileInput = document.getElementById('import-master');
+        const file = fileInput.files[0];
+        if (!file) {
+            alert("Por favor, selecione o arquivo Data.json primeiro.");
+            return;
+        }
         const reader = new FileReader();
         reader.onload = function(e) {
-            masterData = JSON.parse(e.target.result);
-            if(!masterData.history) masterData.history = [];
-            saveAndSync();
-            alert("Sistema Importado!");
+            try {
+                masterData = JSON.parse(e.target.result);
+                localStorage.setItem('futbet_master', JSON.stringify(masterData));
+                alert("SISTEMA CARREGADO: " + (masterData.users.length) + " jogadores prontos.");
+            } catch (err) {
+                alert("Erro ao ler o arquivo. Verifique se é um JSON válido.");
+            }
         };
         reader.readAsText(file);
     }
@@ -148,13 +137,20 @@
     function login() {
         const u = document.getElementById('user').value, p = document.getElementById('pass').value;
         const nav = document.getElementById('nav-bar');
+        
+        // Verifica se masterData tem usuários (se foi carregado)
+        if (masterData.users.length === 0 && u !== "admin") {
+            alert("O sistema está vazio. Importe o Data.json primeiro.");
+            return;
+        }
+
         if(u === "admin" && p === "admin1") {
             currentUser = "admin";
             nav.innerHTML = '<button onclick="showTab(\'ranking\')" class="active">Ranking</button><button onclick="showTab(\'admin\')">⚙️ Admin</button><button onclick="logout()" style="background:#511">Sair</button>';
             showTab('ranking');
         } else {
             const f = masterData.users.find(x => x.u === u && x.p === p);
-            if(!f) return alert("Erro de Login!");
+            if(!f) return alert("Usuário ou Senha incorretos!");
             currentUser = u;
             nav.innerHTML = '<button onclick="showTab(\'palpites\')" class="active">Palpites</button><button onclick="showTab(\'ranking\')">Ranking</button><button onclick="logout()" style="background:#511">Sair</button>';
             showTab('palpites');
@@ -164,43 +160,28 @@
         renderInterface();
     }
 
+    // Funções de Renderização e Lógica (Mantendo a integridade do que já funciona)
     function logout() { location.reload(); }
     function showTab(t) {
         document.querySelectorAll('[id^="tab-"]').forEach(e => e.classList.add('hidden'));
         document.querySelectorAll('.tab-nav button').forEach(e => e.classList.remove('active'));
         document.getElementById('tab-'+t).classList.remove('hidden');
-        if(document.querySelector(`button[onclick="showTab('${t}')"]`)) 
-            document.querySelector(`button[onclick="showTab('${t}')"]`).classList.add('active');
+        if(document.querySelector(`button[onclick*="${t}"]`)) document.querySelector(`button[onclick*="${t}"]`).classList.add('active');
     }
 
-    // --- ADMIN ACTIONS ---
-    function addUser() {
-        const u = document.getElementById('n-u').value, p = document.getElementById('n-p').value, i = document.getElementById('n-i').value;
-        if(!u || !p) return alert("Preencha os campos!");
-        masterData.users.push({ u, p, img: i });
-        saveAndSync(); renderUserList(); alert("Cadastrado!");
-    }
-
-    function deleteUser(idx) { if(confirm("Excluir?")) { masterData.users.splice(idx,1); saveAndSync(); renderUserList(); } }
-    function resetPass(idx) { const np = prompt("Nova Senha:"); if(np){ masterData.users[idx].p = np; saveAndSync(); renderUserList(); } }
-
-    function renderUserList() {
-        const list = document.getElementById('user-manage-list'); list.innerHTML = "";
-        masterData.users.forEach((u, i) => {
-            list.innerHTML += `<div class="user-row"><span><b>${u.u}</b> (${u.p})</span><br><button class="btn-small" onclick="resetPass(${i})">Senha</button><button class="btn-small" onclick="deleteUser(${i})" style="background:#511">Excluir</button></div>`;
-        });
-    }
+    function saveAndSync() { localStorage.setItem('futbet_master', JSON.stringify(masterData)); }
 
     function updateMatchLocal() {
         const m = { a: document.getElementById('adm-a').value, b: document.getElementById('adm-b').value, date: document.getElementById('adm-date').value };
         masterData.match = m;
         if(!masterData.history) masterData.history = [];
         masterData.history.push(m);
-        saveAndSync(); renderInterface(); alert("Publicado!");
+        saveAndSync(); renderInterface(); alert("Jogo Publicado!");
     }
 
     async function inserirDados() {
         const input = document.getElementById('f-p-in');
+        if(!input.files.length) return alert("Selecione os palpites!");
         for(let file of input.files) {
             const content = JSON.parse(await file.text());
             tempPlayers.push(content);
@@ -211,22 +192,14 @@
 
     function processarRankingLocal() {
         const resR = { 
-            v: document.getElementById('res-v').value,
-            a: document.getElementById('res-a').value,
-            g: parseInt(document.getElementById('res-g').value), 
-            e: parseInt(document.getElementById('res-e').value), 
-            c: parseInt(document.getElementById('res-c').value) 
+            v: document.getElementById('res-v').value, a: document.getElementById('res-a').value,
+            g: parseInt(document.getElementById('res-g').value), e: parseInt(document.getElementById('res-e').value), c: parseInt(document.getElementById('res-c').value) 
         };
-        
         let novoRanking = [];
         tempPlayers.forEach(d => {
             let pts = 0, log = "";
-
-            // Pontos Fixos (Vencedor e Ambos Marcam)
-            if(d.v === resR.v) { pts += 1; log += "• Vencedor (+1.0)<br>"; }
-            if(d.a === resR.a) { pts += 1; log += "• Ambos Marcam (+1.0)<br>"; }
-
-            // Pesos (Gols, Escanteios, Cartões)
+            if(d.v === resR.v) { pts += 1; log += "• Venceu (+1.0)<br>"; }
+            if(d.a === resR.a) { pts += 1; log += "• Ambos (+1.0)<br>"; }
             const calc = (aposta, real, tipo) => {
                 const val = parseFloat(aposta); let g = 0;
                 if(aposta.includes('-')) { if(real < Math.abs(val)) g = (Math.abs(val) < 2 ? 1.0 : 0.5); }
@@ -234,27 +207,32 @@
                 if(g > 0) { pts += g; log += `• ${tipo} (+${g})<br>`; }
                 return Math.abs(real - Math.abs(val));
             };
-
             const dG = calc(d.g, resR.g, "Gols"), dE = calc(d.e, resR.e, "Esc"), dC = calc(d.c, resR.c, "Cart");
             novoRanking.push({ nome: d.user, img: d.img, pts, dG, dE, dC, exp: log + `<hr>Diferença: G:${dG}|E:${dE}|C:${dC}` });
         });
-
         masterData.ranking = novoRanking.sort((a,b) => b.pts - a.pts || a.dG - b.dG || a.dE - b.dE || a.dC - b.dC);
-        tempPlayers = []; document.getElementById('p-conf').innerHTML = "";
-        saveAndSync(); renderRanking(); alert("Ranking Atualizado!");
+        tempPlayers = []; saveAndSync(); renderRanking(); alert("Ranking Atualizado!");
     }
 
-    // --- INTERFACE ---
     function renderInterface() {
         if(masterData.match.a) {
             document.getElementById('m-title').innerText = `${masterData.match.a} x ${masterData.match.b}`;
             document.getElementById('m-time').innerText = "Limite: " + new Date(masterData.match.date).toLocaleString();
-            document.getElementById('admin-match-now').innerText = `Jogo: ${masterData.match.a} x ${masterData.match.b}`;
+            document.getElementById('admin-match-now').innerText = `Jogo Atual: ${masterData.match.a} x ${masterData.match.b}`;
         }
+        renderUserList(); renderRanking();
         const hL = document.getElementById('history-list'); hL.innerHTML = "";
         if(masterData.history) masterData.history.slice().reverse().forEach(m => { hL.innerHTML += `<p style="font-size:0.7rem; color:var(--gray)">• ${m.a} x ${m.b}</p>`; });
-        renderUserList(); renderRanking();
     }
+
+    function renderUserList() {
+        const list = document.getElementById('user-manage-list'); list.innerHTML = "<h4>Cadastrados:</h4>";
+        masterData.users.forEach((u, i) => {
+            list.innerHTML += `<div style="font-size:0.8rem; margin-bottom:5px;"><b>${u.u}</b> (${u.p}) <button onclick="deleteUser(${i})" style="padding:2px 5px; background:#511; width:auto; font-size:0.6rem;">X</button></div>`;
+        });
+    }
+
+    function deleteUser(idx) { if(confirm("Excluir?")) { masterData.users.splice(idx,1); saveAndSync(); renderUserList(); } }
 
     function renderRanking() {
         const list = document.getElementById('list-ranking'); list.innerHTML = "";
@@ -263,15 +241,19 @@
         });
     }
 
-    function saveAndSync() { localStorage.setItem('futbet_master', JSON.stringify(masterData)); }
     function exportMasterFile() {
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(masterData)], {type:"application/json"})); a.download = "Data.json"; a.click();
+    }
+    function addUser() {
+        const u = document.getElementById('n-u').value, p = document.getElementById('n-p').value, i = document.getElementById('n-i').value;
+        if(!u || !p) return alert("Preencha!");
+        masterData.users.push({ u, p, img: i }); saveAndSync(); renderUserList(); alert("Salvo!");
     }
     function exportPalpite() {
         const p = { user: currentUser, img: masterData.users.find(x => x.u === currentUser)?.img || "", v: document.getElementById('p-vencedor').value, a: document.getElementById('p-ambos').value, g: document.getElementById('p-gols').value, e: document.getElementById('p-esc').value, c: document.getElementById('p-car').value };
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(p)], {type:"application/json"})); a.download = `palp_${currentUser}.json`; a.click();
     }
-    function resetSystem() { if(confirm("Apagar TUDO?")) { localStorage.clear(); location.reload(); } }
 </script>
+
 </body>
 </html>
