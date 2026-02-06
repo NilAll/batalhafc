@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FutBet Pro - Oficial</title>
+    <title>FutBet Pro - Edição de Cadastro</title>
     <style>
         :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #238636; --text: #f0f6fc; --gold: #d29922; }
         body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; justify-content: center; }
@@ -15,19 +15,16 @@
         .tab-nav { display: flex; gap: 5px; margin-bottom: 15px; }
         .tab-nav button { background: var(--card); font-size: 0.8rem; flex: 1; }
         .tab-nav button.active { background: var(--accent); border: 1px solid #fff; }
-        
-        /* Estilo do Ranking e Tooltip */
         .ranking-item { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); position: relative; }
         .shield { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin: 0 10px; background: #333; border: 1px solid var(--border); }
         .pos { width: 25px; font-weight: bold; color: var(--gold); }
         .info-btn { background: #30363d; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-size: 12px; cursor: pointer; margin-left: 8px; font-weight: bold; }
-        .tooltip { 
-            background: #ffffff; color: #111; padding: 12px; border-radius: 8px; position: absolute; z-index: 1000; 
-            width: 220px; font-size: 0.75rem; left: 50px; top: 40px; display: none; box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: 1px solid var(--gold);
-        }
-        
-        /* Legendas Admin */
-        .admin-label { display: block; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 10px; margin-left: 2px; text-transform: uppercase; }
+        .tooltip { background: #fff; color: #111; padding: 12px; border-radius: 8px; position: absolute; z-index: 1000; width: 220px; font-size: 0.75rem; left: 50px; top: 40px; display: none; box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: 1px solid var(--gold); }
+        .admin-label { display: block; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 10px; text-transform: uppercase; }
+        .user-manage-item { border-bottom: 1px solid #333; padding: 10px 0; font-size: 0.8rem; }
+        .btn-row { display: flex; gap: 5px; margin-top: 5px; }
+        .btn-edit { background: #30363d; font-size: 0.7rem; padding: 5px; flex: 1; }
+        .btn-del { background: #511; font-size: 0.7rem; padding: 5px; flex: 1; }
     </style>
 </head>
 <body>
@@ -83,38 +80,43 @@
                 <button onclick="exportMasterFile()" style="background: var(--gold); color: #000;">💾 BAIXAR DATA.JSON ATUALIZADO</button>
             </div>
 
+            <div class="card">
+                <h3 id="form-user-title">Cadastrar Novo Jogador</h3>
+                <input type="hidden" id="edit-index" value="-1">
+                <input type="text" id="n-u" placeholder="Nome">
+                <input type="text" id="n-p" placeholder="Senha">
+                <input type="text" id="n-i" placeholder="URL Foto do Escudo">
+                <button onclick="saveUser()" id="btn-save-user">CADASTRAR JOGADOR</button>
+                <button onclick="cancelEdit()" id="btn-cancel-edit" class="hidden" style="background:#444;">CANCELAR EDIÇÃO</button>
+                
+                <div id="user-manage-list" style="margin-top:15px;"></div>
+            </div>
+
             <div class="card" style="border: 1px solid var(--accent);">
                 <h3>Processar Rodada</h3>
-                <p id="admin-match-now" style="color:var(--gold); font-weight:bold; font-size:0.9rem;"></p>
                 <input type="file" id="f-p-in" multiple>
                 <button onclick="inserirDados()" style="background:#30363d">ADICIONAR PALPITE(S)</button>
                 <div id="p-conf" style="margin:10px 0; font-size:0.7rem;"></div>
-                
                 <hr style="border:0.5px solid var(--border)">
-                
-                <span class="admin-label">🚩 Vencedor Real do Jogo</span>
+                <span class="admin-label">🚩 Vencedor Real</span>
                 <select id="res-v"><option value="A">Time A</option><option value="B">Time B</option><option value="Empate">Empate</option></select>
-                
                 <span class="admin-label">⚽ Ambos Marcaram?</span>
                 <select id="res-a"><option value="Sim">Sim</option><option value="Não">Não</option></select>
-                
-                <span class="admin-label">🔢 Total de Gols (Número)</span>
-                <input type="number" id="res-g" placeholder="Ex: 3">
-                
-                <span class="admin-label">🚩 Total de Escanteios (Número)</span>
-                <input type="number" id="res-e" placeholder="Ex: 11">
-                
-                <span class="admin-label">🟨 Total de Cartões (Número)</span>
-                <input type="number" id="res-c" placeholder="Ex: 5">
-                
-                <button onclick="processarRankingLocal()" style="margin-top:15px;">GERAR NOVO RANKING</button>
+                <span class="admin-label">🔢 Total Gols</span>
+                <input type="number" id="res-g" placeholder="Ex: 2">
+                <span class="admin-label">🚩 Total Escanteios</span>
+                <input type="number" id="res-e" placeholder="Ex: 10">
+                <span class="admin-label">🟨 Total Cartões</span>
+                <input type="number" id="res-c" placeholder="Ex: 4">
+                <button onclick="processarRankingLocal()">GERAR NOVO RANKING</button>
             </div>
-
+            
             <div class="card">
-                <h3>Gerenciar Jogadores</h3>
-                <input type="text" id="n-u" placeholder="Nome"><input type="text" id="n-p" placeholder="Senha"><input type="text" id="n-i" placeholder="URL Foto do Escudo">
-                <button onclick="addUser()">CADASTRAR JOGADOR</button>
-                <div id="user-manage-list"></div>
+                <h3>Configurar Jogo</h3>
+                <input type="text" id="adm-a" placeholder="Time A">
+                <input type="text" id="adm-b" placeholder="Time B">
+                <input type="datetime-local" id="adm-date">
+                <button onclick="updateMatchLocal()">PUBLICAR JOGO</button>
             </div>
         </div>
     </div>
@@ -177,6 +179,75 @@
 
     function saveAndSync() { localStorage.setItem('futbet_master', JSON.stringify(masterData)); }
 
+    // --- GERENCIAMENTO DE USUÁRIOS COM EDIÇÃO ---
+    function saveUser() {
+        const u = document.getElementById('n-u').value.trim();
+        const p = document.getElementById('n-p').value.trim();
+        const i = document.getElementById('n-i').value.trim();
+        const index = parseInt(document.getElementById('edit-index').value);
+
+        if(!u || !p) return alert("Preencha Nome e Senha!");
+
+        if(index === -1) {
+            masterData.users.push({ u, p, img: i });
+            alert("Jogador cadastrado!");
+        } else {
+            masterData.users[index] = { u, p, img: i };
+            alert("Dados atualizados!");
+            cancelEdit();
+        }
+
+        document.getElementById('n-u').value = "";
+        document.getElementById('n-p').value = "";
+        document.getElementById('n-i').value = "";
+        saveAndSync(); renderUserList();
+    }
+
+    function editUser(index) {
+        const user = masterData.users[index];
+        document.getElementById('n-u').value = user.u;
+        document.getElementById('n-p').value = user.p;
+        document.getElementById('n-i').value = user.img || "";
+        document.getElementById('edit-index').value = index;
+
+        document.getElementById('form-user-title').innerText = "Editando: " + user.u;
+        document.getElementById('btn-save-user').innerText = "SALVAR ALTERAÇÕES";
+        document.getElementById('btn-cancel-edit').classList.remove('hidden');
+    }
+
+    function cancelEdit() {
+        document.getElementById('n-u').value = "";
+        document.getElementById('n-p').value = "";
+        document.getElementById('n-i').value = "";
+        document.getElementById('edit-index').value = "-1";
+        document.getElementById('form-user-title').innerText = "Cadastrar Novo Jogador";
+        document.getElementById('btn-save-user').innerText = "CADASTRAR JOGADOR";
+        document.getElementById('btn-cancel-edit').classList.add('hidden');
+    }
+
+    function deleteUser(idx) { 
+        if(confirm("Excluir este jogador permanentemente?")) { 
+            masterData.users.splice(idx,1); 
+            saveAndSync(); renderUserList(); 
+        } 
+    }
+
+    function renderUserList() {
+        const list = document.getElementById('user-manage-list'); list.innerHTML = "<h4>Cadastrados:</h4>";
+        masterData.users.forEach((u, i) => {
+            list.innerHTML += `
+                <div class="user-manage-item">
+                    <b>${u.u}</b> (Senha: ${u.p})<br>
+                    <span style="font-size:0.65rem; color:var(--gold)">IMG: ${u.img ? u.img.substring(0,30)+'...' : 'Sem foto'}</span>
+                    <div class="btn-row">
+                        <button class="btn-edit" onclick="editUser(${i})">EDITAR</button>
+                        <button class="btn-del" onclick="deleteUser(${i})">X</button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    // --- PROCESSAMENTO E RANKING ---
     function updateMatchLocal() {
         const m = { a: document.getElementById('adm-a').value, b: document.getElementById('adm-b').value, date: document.getElementById('adm-date').value };
         masterData.match = m;
@@ -213,7 +284,7 @@
                 const val = parseFloat(aposta); let g = 0;
                 if(aposta.includes('-')) { if(real < Math.abs(val)) g = (Math.abs(val) < 2 ? 1.0 : 0.5); }
                 else { if(real > val) g = (val < 1 ? 0.1 : val < 5 ? 0.3 : 1.0); }
-                if(g > 0) { pts += g; log += `✅ ${tipo} (+${g})<br>`; }
+                if(g > 0) { pts += g; log += `• ${tipo} (+${g})<br>`; }
                 return Math.abs(real - Math.abs(val));
             };
 
@@ -229,7 +300,6 @@
         if(masterData.match && masterData.match.a) {
             document.getElementById('m-title').innerText = `${masterData.match.a} x ${masterData.match.b}`;
             document.getElementById('m-time').innerText = "Limite: " + new Date(masterData.match.date).toLocaleString();
-            document.getElementById('admin-match-now').innerText = `Jogo: ${masterData.match.a} x ${masterData.match.b}`;
         }
         renderUserList(); renderRanking();
     }
@@ -255,23 +325,25 @@
         });
     }
 
-    function renderUserList() {
-        const list = document.getElementById('user-manage-list'); list.innerHTML = "";
-        masterData.users.forEach((u, i) => {
-            list.innerHTML += `<div style="font-size:0.8rem; border-bottom:1px solid #333; padding:5px;"><b>${u.u}</b> <button onclick="deleteUser(${i})" style="padding:2px; background:#511; width:auto; font-size:0.6rem;">X</button></div>`;
-        });
+    function exportMasterFile() { 
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(masterData)], {type:"application/json"})); 
+        a.download = "Data.json"; a.click(); 
     }
 
-    function deleteUser(idx) { if(confirm("Excluir?")) { masterData.users.splice(idx,1); saveAndSync(); renderUserList(); } }
-    function exportMasterFile() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(masterData)], {type:"application/json"})); a.download = "Data.json"; a.click(); }
-    function addUser() {
-        const u = document.getElementById('n-u').value, p = document.getElementById('n-p').value, i = document.getElementById('n-i').value;
-        if(!u || !p) return alert("Preencha!");
-        masterData.users.push({ u, p, img: i }); saveAndSync(); renderUserList(); alert("Salvo!");
-    }
     function exportPalpite() {
-        const p = { user: currentUser, img: masterData.users.find(x => x.u === currentUser)?.img || "", v: document.getElementById('p-vencedor').value, a: document.getElementById('p-ambos').value, g: document.getElementById('p-gols').value, e: document.getElementById('p-esc').value, c: document.getElementById('p-car').value };
-        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(p)], {type:"application/json"})); a.download = `palp_${currentUser}.json`; a.click();
+        const p = { 
+            user: currentUser, 
+            img: masterData.users.find(x => x.u === currentUser)?.img || "", 
+            v: document.getElementById('p-vencedor').value, 
+            a: document.getElementById('p-ambos').value, 
+            g: document.getElementById('p-gols').value, 
+            e: document.getElementById('p-esc').value, 
+            c: document.getElementById('p-car').value 
+        };
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(p)], {type:"application/json"})); 
+        a.download = `palp_${currentUser}.json`; a.click();
     }
 </script>
 </body>
