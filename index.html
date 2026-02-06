@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FutBet Pro - Importação Garantida</title>
+    <title>FutBet Pro - Oficial</title>
     <style>
         :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #238636; --text: #f0f6fc; --gold: #d29922; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; display: flex; justify-content: center; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; justify-content: center; }
         #app { width: 100%; max-width: 480px; padding: 15px; box-sizing: border-box; min-height: 100vh; }
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
         .hidden { display: none !important; }
         input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid var(--border); background: #0d1117; color: white; box-sizing: border-box; }
         button { background: var(--accent); border: none; font-weight: bold; cursor: pointer; }
         .tab-nav { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab-nav button { background: var(--card); font-size: 0.8rem; }
+        .tab-nav button { background: var(--card); font-size: 0.8rem; flex: 1; }
         .tab-nav button.active { background: var(--accent); border: 1px solid #fff; }
         .ranking-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid var(--border); position: relative; }
         .shield { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; margin: 0 10px; background: #222; }
@@ -26,17 +26,24 @@
 <body>
 
 <div id="app">
-    <div id="view-login" onkeydown="if(event.keyCode==13) login()">
-        <div class="card" style="text-align: center; margin-top: 50px;">
+    <div id="view-login">
+        <div class="card" style="text-align: center; margin-top: 30px;">
             <h1 style="color: var(--accent);">🏟️ FutBet</h1>
-            <p style="font-size: 0.8rem; color: var(--gold);">1. Selecione o arquivo <b>Data.json</b></p>
-            <input type="file" id="import-master" accept=".json">
-            <button onclick="manualLoadMaster()" style="background: #30363d; margin-top: 0;">📥 CARREGAR DADOS DO SISTEMA</button>
-            <hr style="border:0.5px solid var(--border); margin:15px 0;">
-            <p style="font-size: 0.8rem;">2. Insira suas credenciais</p>
-            <input type="text" id="user" placeholder="Usuário">
-            <input type="password" id="pass" placeholder="Senha">
-            <button onclick="login()">ENTRAR NO JOGO</button>
+            
+            <div style="background: #1c2128; padding: 10px; border-radius: 8px; border: 1px dashed var(--gold);">
+                <p style="font-size: 0.8rem; margin: 0 0 10px 0; color: var(--gold);">1º Selecione e Ative os Dados</p>
+                <input type="file" id="import-master" accept=".json">
+                <button onclick="manualLoadMaster()" style="background: #d29922; color: #000;">ATIVAR DATA.JSON</button>
+            </div>
+
+            <hr style="border:0.5px solid var(--border); margin:20px 0;">
+            
+            <div onkeydown="if(event.keyCode==13) login()">
+                <p style="font-size: 0.8rem; margin-bottom: 10px;">2º Login de Usuário</p>
+                <input type="text" id="user-login" placeholder="Nome do Jogador">
+                <input type="password" id="pass-login" placeholder="Sua Senha">
+                <button onclick="login()">ENTRAR COM ENTER</button>
+            </div>
         </div>
     </div>
 
@@ -45,7 +52,7 @@
 
         <div id="tab-palpites" class="hidden">
             <div class="card">
-                <h3 id="m-title" style="text-align:center;">Sem Jogo</h3>
+                <h3 id="m-title" style="text-align:center;">---</h3>
                 <p id="m-time" style="text-align:center; font-size:0.8rem; color:var(--gold);"></p>
                 <label>Vencedor:</label>
                 <select id="p-vencedor"><option value="A">Time A</option><option value="B">Time B</option><option value="Empate">Empate</option></select>
@@ -78,11 +85,10 @@
                 <input type="text" id="adm-b" placeholder="Time B">
                 <input type="datetime-local" id="adm-date">
                 <button onclick="updateMatchLocal()">PUBLICAR JOGO</button>
-                <details><summary style="cursor:pointer; color:var(--gold);">Histórico</summary><div id="history-list"></div></details>
+                <details><summary style="cursor:pointer; color:var(--gold); font-size: 0.8rem;">Histórico</summary><div id="history-list"></div></details>
             </div>
             <div class="card" style="border: 1px solid var(--accent);">
                 <h3>2. Processar Rodada</h3>
-                <p id="admin-match-now" style="color:var(--gold); font-weight:bold;"></p>
                 <input type="file" id="f-p-in" multiple>
                 <button onclick="inserirDados()" style="background:#30363d">ADICIONAR PALPITE(S)</button>
                 <div id="p-conf" style="margin:10px 0; font-size:0.7rem;"></div>
@@ -96,7 +102,7 @@
                 <button onclick="processarRankingLocal()">GERAR NOVO RANKING</button>
             </div>
             <div class="card">
-                <h3>3. Jogadores</h3>
+                <h3>3. Gerenciar Jogadores</h3>
                 <input type="text" id="n-u" placeholder="Nome"><input type="text" id="n-p" placeholder="Senha"><input type="text" id="n-i" placeholder="URL Foto">
                 <button onclick="addUser()">CADASTRAR JOGADOR</button>
                 <div id="user-manage-list"></div>
@@ -109,64 +115,62 @@
     let masterData = { users: [], match: { a: "", b: "", date: "" }, ranking: [], history: [] };
     let currentUser = null, tempPlayers = [];
 
-    // Tenta carregar automaticamente se houver mudança no arquivo
-    document.getElementById('import-master').addEventListener('change', function() {
-        manualLoadMaster();
-    });
+    // Tenta carregar do cache do navegador
+    const savedData = localStorage.getItem('futbet_master');
+    if(savedData) masterData = JSON.parse(savedData);
 
     function manualLoadMaster() {
         const fileInput = document.getElementById('import-master');
         const file = fileInput.files[0];
-        if (!file) {
-            alert("Por favor, selecione o arquivo Data.json primeiro.");
-            return;
-        }
+        if (!file) { alert("Selecione o arquivo primeiro!"); return; }
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 masterData = JSON.parse(e.target.result);
                 localStorage.setItem('futbet_master', JSON.stringify(masterData));
-                alert("SISTEMA CARREGADO: " + (masterData.users.length) + " jogadores prontos.");
-            } catch (err) {
-                alert("Erro ao ler o arquivo. Verifique se é um JSON válido.");
-            }
+                alert("SISTEMA ATIVADO! " + masterData.users.length + " jogadores carregados.");
+            } catch (err) { alert("Arquivo inválido."); }
         };
         reader.readAsText(file);
     }
 
     function login() {
-        const u = document.getElementById('user').value, p = document.getElementById('pass').value;
+        // Trim() remove espaços em branco antes ou depois do texto
+        const u = document.getElementById('user-login').value.trim();
+        const p = document.getElementById('pass-login').value.trim();
         const nav = document.getElementById('nav-bar');
-        
-        // Verifica se masterData tem usuários (se foi carregado)
-        if (masterData.users.length === 0 && u !== "admin") {
-            alert("O sistema está vazio. Importe o Data.json primeiro.");
-            return;
-        }
 
         if(u === "admin" && p === "admin1") {
             currentUser = "admin";
-            nav.innerHTML = '<button onclick="showTab(\'ranking\')" class="active">Ranking</button><button onclick="showTab(\'admin\')">⚙️ Admin</button><button onclick="logout()" style="background:#511">Sair</button>';
-            showTab('ranking');
-        } else {
-            const f = masterData.users.find(x => x.u === u && x.p === p);
-            if(!f) return alert("Usuário ou Senha incorretos!");
-            currentUser = u;
-            nav.innerHTML = '<button onclick="showTab(\'palpites\')" class="active">Palpites</button><button onclick="showTab(\'ranking\')">Ranking</button><button onclick="logout()" style="background:#511">Sair</button>';
-            showTab('palpites');
+            nav.innerHTML = '<button onclick="showTab(\'ranking\')" id="btn-ranking" class="active">Ranking</button><button onclick="showTab(\'admin\')" id="btn-admin">⚙️ Admin</button><button onclick="logout()" style="background:#511">Sair</button>';
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('view-main').classList.remove('hidden');
+            showTab('ranking'); renderInterface(); return;
         }
-        document.getElementById('view-login').classList.add('hidden');
-        document.getElementById('view-main').classList.remove('hidden');
-        renderInterface();
+
+        if (!masterData.users || masterData.users.length === 0) {
+            alert("Base de dados vazia! Ative o Data.json.");
+            return;
+        }
+
+        const found = masterData.users.find(user => user.u.trim() === u && user.p.trim() === p);
+        if(found) {
+            currentUser = u;
+            nav.innerHTML = '<button onclick="showTab(\'palpites\')" id="btn-palpites" class="active">Palpites</button><button onclick="showTab(\'ranking\')" id="btn-ranking">Ranking</button><button onclick="logout()" style="background:#511">Sair</button>';
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('view-main').classList.remove('hidden');
+            showTab('palpites'); renderInterface();
+        } else {
+            alert("Usuário ou senha não encontrados. Verifique se o Eduardo foi cadastrado e o arquivo mestre foi baixado/ativado.");
+        }
     }
 
-    // Funções de Renderização e Lógica (Mantendo a integridade do que já funciona)
     function logout() { location.reload(); }
     function showTab(t) {
         document.querySelectorAll('[id^="tab-"]').forEach(e => e.classList.add('hidden'));
         document.querySelectorAll('.tab-nav button').forEach(e => e.classList.remove('active'));
         document.getElementById('tab-'+t).classList.remove('hidden');
-        if(document.querySelector(`button[onclick*="${t}"]`)) document.querySelector(`button[onclick*="${t}"]`).classList.add('active');
+        if(document.getElementById('btn-'+t)) document.getElementById('btn-'+t).classList.add('active');
     }
 
     function saveAndSync() { localStorage.setItem('futbet_master', JSON.stringify(masterData)); }
@@ -181,7 +185,6 @@
 
     async function inserirDados() {
         const input = document.getElementById('f-p-in');
-        if(!input.files.length) return alert("Selecione os palpites!");
         for(let file of input.files) {
             const content = JSON.parse(await file.text());
             tempPlayers.push(content);
@@ -191,10 +194,7 @@
     }
 
     function processarRankingLocal() {
-        const resR = { 
-            v: document.getElementById('res-v').value, a: document.getElementById('res-a').value,
-            g: parseInt(document.getElementById('res-g').value), e: parseInt(document.getElementById('res-e').value), c: parseInt(document.getElementById('res-c').value) 
-        };
+        const resR = { v: document.getElementById('res-v').value, a: document.getElementById('res-a').value, g: parseInt(document.getElementById('res-g').value), e: parseInt(document.getElementById('res-e').value), c: parseInt(document.getElementById('res-c').value) };
         let novoRanking = [];
         tempPlayers.forEach(d => {
             let pts = 0, log = "";
@@ -215,10 +215,9 @@
     }
 
     function renderInterface() {
-        if(masterData.match.a) {
+        if(masterData.match && masterData.match.a) {
             document.getElementById('m-title').innerText = `${masterData.match.a} x ${masterData.match.b}`;
-            document.getElementById('m-time').innerText = "Limite: " + new Date(masterData.match.date).toLocaleString();
-            document.getElementById('admin-match-now').innerText = `Jogo Atual: ${masterData.match.a} x ${masterData.match.b}`;
+            document.getElementById('m-time').innerText = "Até: " + new Date(masterData.match.date).toLocaleString();
         }
         renderUserList(); renderRanking();
         const hL = document.getElementById('history-list'); hL.innerHTML = "";
@@ -228,7 +227,7 @@
     function renderUserList() {
         const list = document.getElementById('user-manage-list'); list.innerHTML = "<h4>Cadastrados:</h4>";
         masterData.users.forEach((u, i) => {
-            list.innerHTML += `<div style="font-size:0.8rem; margin-bottom:5px;"><b>${u.u}</b> (${u.p}) <button onclick="deleteUser(${i})" style="padding:2px 5px; background:#511; width:auto; font-size:0.6rem;">X</button></div>`;
+            list.innerHTML += `<div style="font-size:0.8rem; margin-bottom:5px; border-bottom:1px solid #333; padding:5px;"><b>${u.u}</b> (${u.p}) <button onclick="deleteUser(${i})" style="padding:2px; background:#511; font-size:0.6rem; width:auto;">Excluir</button></div>`;
         });
     }
 
@@ -244,16 +243,17 @@
     function exportMasterFile() {
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(masterData)], {type:"application/json"})); a.download = "Data.json"; a.click();
     }
+
     function addUser() {
         const u = document.getElementById('n-u').value, p = document.getElementById('n-p').value, i = document.getElementById('n-i').value;
         if(!u || !p) return alert("Preencha!");
         masterData.users.push({ u, p, img: i }); saveAndSync(); renderUserList(); alert("Salvo!");
     }
+
     function exportPalpite() {
         const p = { user: currentUser, img: masterData.users.find(x => x.u === currentUser)?.img || "", v: document.getElementById('p-vencedor').value, a: document.getElementById('p-ambos').value, g: document.getElementById('p-gols').value, e: document.getElementById('p-esc').value, c: document.getElementById('p-car').value };
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(p)], {type:"application/json"})); a.download = `palp_${currentUser}.json`; a.click();
     }
 </script>
-
 </body>
 </html>
