@@ -15,12 +15,19 @@
         .tab-nav { display: flex; gap: 5px; margin-bottom: 15px; }
         .tab-nav button { background: var(--card); font-size: 0.8rem; flex: 1; }
         .tab-nav button.active { background: var(--accent); border: 1px solid #fff; }
-        .ranking-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid var(--border); position: relative; }
-        .shield { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; margin: 0 10px; background: #222; }
+        
+        /* Estilo do Ranking e Tooltip */
+        .ranking-item { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); position: relative; }
+        .shield { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin: 0 10px; background: #333; border: 1px solid var(--border); }
         .pos { width: 25px; font-weight: bold; color: var(--gold); }
-        .info-btn { background: #30363d; width: 18px; height: 18px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-size: 10px; cursor: pointer; margin-left: 5px; }
-        .tooltip { background: #eee; color: #111; padding: 10px; border-radius: 5px; position: absolute; z-index: 100; width: 200px; font-size: 0.7rem; right: 0; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-        .info-btn:hover + .tooltip { display: block; }
+        .info-btn { background: #30363d; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-size: 12px; cursor: pointer; margin-left: 8px; font-weight: bold; }
+        .tooltip { 
+            background: #ffffff; color: #111; padding: 12px; border-radius: 8px; position: absolute; z-index: 1000; 
+            width: 220px; font-size: 0.75rem; left: 50px; top: 40px; display: none; box-shadow: 0 8px 20px rgba(0,0,0,0.6); border: 1px solid var(--gold);
+        }
+        
+        /* Legendas Admin */
+        .admin-label { display: block; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 10px; margin-left: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -29,20 +36,16 @@
     <div id="view-login">
         <div class="card" style="text-align: center; margin-top: 30px;">
             <h1 style="color: var(--accent);">🏟️ FutBet</h1>
-            
             <div style="background: #1c2128; padding: 10px; border-radius: 8px; border: 1px dashed var(--gold);">
-                <p style="font-size: 0.8rem; margin: 0 0 10px 0; color: var(--gold);">1º Selecione e Ative os Dados</p>
+                <p style="font-size: 0.8rem; margin: 0 0 10px 0;">1º Selecione e Ative o Arquivo</p>
                 <input type="file" id="import-master" accept=".json">
                 <button onclick="manualLoadMaster()" style="background: #d29922; color: #000;">ATIVAR DATA.JSON</button>
             </div>
-
             <hr style="border:0.5px solid var(--border); margin:20px 0;">
-            
             <div onkeydown="if(event.keyCode==13) login()">
-                <p style="font-size: 0.8rem; margin-bottom: 10px;">2º Login de Usuário</p>
                 <input type="text" id="user-login" placeholder="Nome do Jogador">
-                <input type="password" id="pass-login" placeholder="Sua Senha">
-                <button onclick="login()">ENTRAR COM ENTER</button>
+                <input type="password" id="pass-login" placeholder="Senha">
+                <button onclick="login()">ENTRAR</button>
             </div>
         </div>
     </div>
@@ -79,31 +82,37 @@
             <div class="card" style="border: 1px solid var(--gold);">
                 <button onclick="exportMasterFile()" style="background: var(--gold); color: #000;">💾 BAIXAR DATA.JSON ATUALIZADO</button>
             </div>
-            <div class="card">
-                <h3>1. Configurar Jogo</h3>
-                <input type="text" id="adm-a" placeholder="Time A">
-                <input type="text" id="adm-b" placeholder="Time B">
-                <input type="datetime-local" id="adm-date">
-                <button onclick="updateMatchLocal()">PUBLICAR JOGO</button>
-                <details><summary style="cursor:pointer; color:var(--gold); font-size: 0.8rem;">Histórico</summary><div id="history-list"></div></details>
-            </div>
+
             <div class="card" style="border: 1px solid var(--accent);">
-                <h3>2. Processar Rodada</h3>
+                <h3>Processar Rodada</h3>
+                <p id="admin-match-now" style="color:var(--gold); font-weight:bold; font-size:0.9rem;"></p>
                 <input type="file" id="f-p-in" multiple>
                 <button onclick="inserirDados()" style="background:#30363d">ADICIONAR PALPITE(S)</button>
                 <div id="p-conf" style="margin:10px 0; font-size:0.7rem;"></div>
+                
                 <hr style="border:0.5px solid var(--border)">
-                <label>Resultado Real:</label>
+                
+                <span class="admin-label">🚩 Vencedor Real do Jogo</span>
                 <select id="res-v"><option value="A">Time A</option><option value="B">Time B</option><option value="Empate">Empate</option></select>
+                
+                <span class="admin-label">⚽ Ambos Marcaram?</span>
                 <select id="res-a"><option value="Sim">Sim</option><option value="Não">Não</option></select>
-                <input type="number" id="res-g" placeholder="Gols">
-                <input type="number" id="res-e" placeholder="Escanteios">
-                <input type="number" id="res-c" placeholder="Cartões">
-                <button onclick="processarRankingLocal()">GERAR NOVO RANKING</button>
+                
+                <span class="admin-label">🔢 Total de Gols (Número)</span>
+                <input type="number" id="res-g" placeholder="Ex: 3">
+                
+                <span class="admin-label">🚩 Total de Escanteios (Número)</span>
+                <input type="number" id="res-e" placeholder="Ex: 11">
+                
+                <span class="admin-label">🟨 Total de Cartões (Número)</span>
+                <input type="number" id="res-c" placeholder="Ex: 5">
+                
+                <button onclick="processarRankingLocal()" style="margin-top:15px;">GERAR NOVO RANKING</button>
             </div>
+
             <div class="card">
-                <h3>3. Gerenciar Jogadores</h3>
-                <input type="text" id="n-u" placeholder="Nome"><input type="text" id="n-p" placeholder="Senha"><input type="text" id="n-i" placeholder="URL Foto">
+                <h3>Gerenciar Jogadores</h3>
+                <input type="text" id="n-u" placeholder="Nome"><input type="text" id="n-p" placeholder="Senha"><input type="text" id="n-i" placeholder="URL Foto do Escudo">
                 <button onclick="addUser()">CADASTRAR JOGADOR</button>
                 <div id="user-manage-list"></div>
             </div>
@@ -115,62 +124,55 @@
     let masterData = { users: [], match: { a: "", b: "", date: "" }, ranking: [], history: [] };
     let currentUser = null, tempPlayers = [];
 
-    // Tenta carregar do cache do navegador
     const savedData = localStorage.getItem('futbet_master');
     if(savedData) masterData = JSON.parse(savedData);
 
     function manualLoadMaster() {
         const fileInput = document.getElementById('import-master');
         const file = fileInput.files[0];
-        if (!file) { alert("Selecione o arquivo primeiro!"); return; }
+        if (!file) { alert("Selecione o arquivo!"); return; }
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 masterData = JSON.parse(e.target.result);
                 localStorage.setItem('futbet_master', JSON.stringify(masterData));
-                alert("SISTEMA ATIVADO! " + masterData.users.length + " jogadores carregados.");
+                alert("SISTEMA ATIVADO!");
             } catch (err) { alert("Arquivo inválido."); }
         };
         reader.readAsText(file);
     }
 
     function login() {
-        // Trim() remove espaços em branco antes ou depois do texto
         const u = document.getElementById('user-login').value.trim();
         const p = document.getElementById('pass-login').value.trim();
         const nav = document.getElementById('nav-bar');
 
         if(u === "admin" && p === "admin1") {
             currentUser = "admin";
-            nav.innerHTML = '<button onclick="showTab(\'ranking\')" id="btn-ranking" class="active">Ranking</button><button onclick="showTab(\'admin\')" id="btn-admin">⚙️ Admin</button><button onclick="logout()" style="background:#511">Sair</button>';
+            nav.innerHTML = '<button onclick="showTab(\'ranking\')" class="active">Ranking</button><button onclick="showTab(\'admin\')">⚙️ Admin</button><button onclick="logout()" style="background:#511">Sair</button>';
             document.getElementById('view-login').classList.add('hidden');
             document.getElementById('view-main').classList.remove('hidden');
             showTab('ranking'); renderInterface(); return;
         }
 
-        if (!masterData.users || masterData.users.length === 0) {
-            alert("Base de dados vazia! Ative o Data.json.");
-            return;
-        }
-
         const found = masterData.users.find(user => user.u.trim() === u && user.p.trim() === p);
         if(found) {
             currentUser = u;
-            nav.innerHTML = '<button onclick="showTab(\'palpites\')" id="btn-palpites" class="active">Palpites</button><button onclick="showTab(\'ranking\')" id="btn-ranking">Ranking</button><button onclick="logout()" style="background:#511">Sair</button>';
+            nav.innerHTML = '<button onclick="showTab(\'palpites\')" class="active">Palpites</button><button onclick="showTab(\'ranking\')">Ranking</button><button onclick="logout()" style="background:#511">Sair</button>';
             document.getElementById('view-login').classList.add('hidden');
             document.getElementById('view-main').classList.remove('hidden');
             showTab('palpites'); renderInterface();
-        } else {
-            alert("Usuário ou senha não encontrados. Verifique se o Eduardo foi cadastrado e o arquivo mestre foi baixado/ativado.");
-        }
+        } else { alert("Acesso Negado."); }
     }
 
     function logout() { location.reload(); }
+    
     function showTab(t) {
         document.querySelectorAll('[id^="tab-"]').forEach(e => e.classList.add('hidden'));
         document.querySelectorAll('.tab-nav button').forEach(e => e.classList.remove('active'));
         document.getElementById('tab-'+t).classList.remove('hidden');
-        if(document.getElementById('btn-'+t)) document.getElementById('btn-'+t).classList.add('active');
+        const btn = Array.from(document.querySelectorAll('.tab-nav button')).find(b => b.getAttribute('onclick').includes(t));
+        if(btn) btn.classList.add('active');
     }
 
     function saveAndSync() { localStorage.setItem('futbet_master', JSON.stringify(masterData)); }
@@ -194,22 +196,31 @@
     }
 
     function processarRankingLocal() {
-        const resR = { v: document.getElementById('res-v').value, a: document.getElementById('res-a').value, g: parseInt(document.getElementById('res-g').value), e: parseInt(document.getElementById('res-e').value), c: parseInt(document.getElementById('res-c').value) };
+        const resR = { 
+            v: document.getElementById('res-v').value, a: document.getElementById('res-a').value,
+            g: parseInt(document.getElementById('res-g').value) || 0, 
+            e: parseInt(document.getElementById('res-e').value) || 0, 
+            c: parseInt(document.getElementById('res-c').value) || 0 
+        };
+        
         let novoRanking = [];
         tempPlayers.forEach(d => {
             let pts = 0, log = "";
-            if(d.v === resR.v) { pts += 1; log += "• Venceu (+1.0)<br>"; }
-            if(d.a === resR.a) { pts += 1; log += "• Ambos (+1.0)<br>"; }
+            if(d.v === resR.v) { pts += 1; log += "✅ Vencedor (+1.0)<br>"; }
+            if(d.a === resR.a) { pts += 1; log += "✅ Ambos (+1.0)<br>"; }
+
             const calc = (aposta, real, tipo) => {
                 const val = parseFloat(aposta); let g = 0;
                 if(aposta.includes('-')) { if(real < Math.abs(val)) g = (Math.abs(val) < 2 ? 1.0 : 0.5); }
                 else { if(real > val) g = (val < 1 ? 0.1 : val < 5 ? 0.3 : 1.0); }
-                if(g > 0) { pts += g; log += `• ${tipo} (+${g})<br>`; }
+                if(g > 0) { pts += g; log += `✅ ${tipo} (+${g})<br>`; }
                 return Math.abs(real - Math.abs(val));
             };
+
             const dG = calc(d.g, resR.g, "Gols"), dE = calc(d.e, resR.e, "Esc"), dC = calc(d.c, resR.c, "Cart");
-            novoRanking.push({ nome: d.user, img: d.img, pts, dG, dE, dC, exp: log + `<hr>Diferença: G:${dG}|E:${dE}|C:${dC}` });
+            novoRanking.push({ nome: d.user, img: d.img, pts, dG, dE, dC, exp: log, difTexto: `Diferença Gols: ${dG}<br>Diferença Esc: ${dE}<br>Diferença Cart: ${dC}` });
         });
+
         masterData.ranking = novoRanking.sort((a,b) => b.pts - a.pts || a.dG - b.dG || a.dE - b.dE || a.dC - b.dC);
         tempPlayers = []; saveAndSync(); renderRanking(); alert("Ranking Atualizado!");
     }
@@ -217,39 +228,47 @@
     function renderInterface() {
         if(masterData.match && masterData.match.a) {
             document.getElementById('m-title').innerText = `${masterData.match.a} x ${masterData.match.b}`;
-            document.getElementById('m-time').innerText = "Até: " + new Date(masterData.match.date).toLocaleString();
+            document.getElementById('m-time').innerText = "Limite: " + new Date(masterData.match.date).toLocaleString();
+            document.getElementById('admin-match-now').innerText = `Jogo: ${masterData.match.a} x ${masterData.match.b}`;
         }
         renderUserList(); renderRanking();
-        const hL = document.getElementById('history-list'); hL.innerHTML = "";
-        if(masterData.history) masterData.history.slice().reverse().forEach(m => { hL.innerHTML += `<p style="font-size:0.7rem; color:var(--gray)">• ${m.a} x ${m.b}</p>`; });
     }
-
-    function renderUserList() {
-        const list = document.getElementById('user-manage-list'); list.innerHTML = "<h4>Cadastrados:</h4>";
-        masterData.users.forEach((u, i) => {
-            list.innerHTML += `<div style="font-size:0.8rem; margin-bottom:5px; border-bottom:1px solid #333; padding:5px;"><b>${u.u}</b> (${u.p}) <button onclick="deleteUser(${i})" style="padding:2px; background:#511; font-size:0.6rem; width:auto;">Excluir</button></div>`;
-        });
-    }
-
-    function deleteUser(idx) { if(confirm("Excluir?")) { masterData.users.splice(idx,1); saveAndSync(); renderUserList(); } }
 
     function renderRanking() {
         const list = document.getElementById('list-ranking'); list.innerHTML = "";
         masterData.ranking.forEach((p, i) => {
-            list.innerHTML += `<div class="ranking-item"><div class="pos">${i+1}º</div><img src="${p.img}" class="shield"><strong>${p.nome}</strong><span class="info-btn">?</span><div class="tooltip">${p.exp}</div><div style="flex-grow:1; text-align:right; font-weight:bold; color:var(--accent);">${p.pts.toFixed(1)}</div></div>`;
+            list.innerHTML += `
+                <div class="ranking-item">
+                    <div class="pos">${i+1}º</div>
+                    <img src="${p.img || 'https://via.placeholder.com/40'}" class="shield" onerror="this.src='https://via.placeholder.com/40'">
+                    <div style="flex-grow:1">
+                        <strong>${p.nome}</strong>
+                        <span class="info-btn" onclick="let t=this.nextElementSibling; t.style.display=(t.style.display==='block'?'none':'block')">?</span>
+                        <div class="tooltip">
+                            <b>Pontos Ganhos:</b><br>${p.exp || "Nenhum acerto."}
+                            <hr style="margin:8px 0; border:0; border-top:1px solid #ccc;">
+                            <b>Desempate (Proximidade):</b><br>${p.difTexto}
+                        </div>
+                    </div>
+                    <div style="font-weight:bold; color:var(--accent);">${p.pts.toFixed(1)}</div>
+                </div>`;
         });
     }
 
-    function exportMasterFile() {
-        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(masterData)], {type:"application/json"})); a.download = "Data.json"; a.click();
+    function renderUserList() {
+        const list = document.getElementById('user-manage-list'); list.innerHTML = "";
+        masterData.users.forEach((u, i) => {
+            list.innerHTML += `<div style="font-size:0.8rem; border-bottom:1px solid #333; padding:5px;"><b>${u.u}</b> <button onclick="deleteUser(${i})" style="padding:2px; background:#511; width:auto; font-size:0.6rem;">X</button></div>`;
+        });
     }
 
+    function deleteUser(idx) { if(confirm("Excluir?")) { masterData.users.splice(idx,1); saveAndSync(); renderUserList(); } }
+    function exportMasterFile() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(masterData)], {type:"application/json"})); a.download = "Data.json"; a.click(); }
     function addUser() {
         const u = document.getElementById('n-u').value, p = document.getElementById('n-p').value, i = document.getElementById('n-i').value;
         if(!u || !p) return alert("Preencha!");
         masterData.users.push({ u, p, img: i }); saveAndSync(); renderUserList(); alert("Salvo!");
     }
-
     function exportPalpite() {
         const p = { user: currentUser, img: masterData.users.find(x => x.u === currentUser)?.img || "", v: document.getElementById('p-vencedor').value, a: document.getElementById('p-ambos').value, g: document.getElementById('p-gols').value, e: document.getElementById('p-esc').value, c: document.getElementById('p-car').value };
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(p)], {type:"application/json"})); a.download = `palp_${currentUser}.json`; a.click();
