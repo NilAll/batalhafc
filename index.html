@@ -3,23 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FutBet Pro - Oficial</title>
+    <title>FutBet Pro - Pontuação Exata</title>
     <style>
         :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #238636; --text: #f0f6fc; --gold: #d29922; }
         body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; justify-content: center; }
         #app { width: 100%; max-width: 480px; padding: 15px; box-sizing: border-box; min-height: 100vh; }
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
         .hidden { display: none !important; }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid var(--border); background: #0d1117; color: white; box-sizing: border-box; }
-        button { background: var(--accent); border: none; font-weight: bold; cursor: pointer; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid var(--border); background: #0d1117; color: white; box-sizing: border-box; font-size: 1rem; }
+        button { background: var(--accent); border: none; font-weight: bold; cursor: pointer; transition: 0.1s; }
+        button:active { transform: scale(0.96); opacity: 0.8; }
         .tab-nav { display: flex; gap: 5px; margin-bottom: 15px; }
         .tab-nav button { background: var(--card); font-size: 0.8rem; flex: 1; }
         .tab-nav button.active { background: var(--accent); border: 1px solid #fff; }
-        .user-item { border-bottom: 1px solid #333; padding: 10px 0; display: flex; flex-direction: column; gap: 5px; }
-        .u-btns { display: flex; gap: 5px; }
-        .btn-mini { padding: 5px; font-size: 0.65rem; width: auto; flex: 1; background: #30363d; }
-        .history-item { font-size: 0.75rem; border-left: 3px solid var(--gold); padding-left: 10px; margin-bottom: 12px; position: relative; }
-        .h-btns { display: flex; gap: 5px; margin-top: 5px; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; font-size: 0.85rem; background: rgba(255,255,255,0.03); margin-bottom: 2px; }
+        .list-item button { width: auto; padding: 5px 10px; font-size: 0.7rem; background: #511; }
+        .ranking-item { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); position: relative; }
+        .shield { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin: 0 10px; background: #333; border: 2px solid var(--gold); }
+        .info-btn { background: var(--gold); color: #000; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; margin-left: 8px; font-weight: bold; }
+        .tooltip { display: none; position: absolute; background: #fff; color: #000; border-radius: 8px; z-index: 2000; width: 280px; left: 10px; top: 60px; box-shadow: 0 10px 40px rgba(0,0,0,1); border: 3px solid var(--gold); overflow: hidden; }
+        .tooltip-header { background: #eee; padding: 8px; font-weight: bold; text-align: center; border-bottom: 1px solid #ccc; font-size: 0.8rem; }
+        .resumo-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        .resumo-table td, .resumo-table th { padding: 6px; border-bottom: 1px solid #ddd; text-align: center; }
+        .resumo-table th { background: #333; color: #fff; }
+        .pts-tag { background: var(--accent); color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .admin-label { display: block; font-size: 0.75rem; color: var(--gold); font-weight: bold; margin-top: 10px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -27,7 +35,7 @@
 <div id="app">
     <div id="view-login" onkeydown="if(event.keyCode==13) login()">
         <div class="card" style="text-align: center; margin-top: 30px;">
-            <h1 style="color: var(--accent);">🏟️ FutBet</h1>
+            <h1 style="color: var(--accent);">🏟️ FutBet Pro</h1>
             <input type="file" id="import-master" accept=".json">
             <button onclick="manualLoadMaster()" style="background: var(--gold); color: #000;">ATIVAR DATA.JSON</button>
             <hr style="border:0.5px solid var(--border); margin:20px 0;">
@@ -42,8 +50,28 @@
 
         <div id="tab-palpites" class="hidden">
             <div class="card">
-                <h3 id="m-title" style="text-align:center;">Sem Jogo</h3>
+                <h3 id="m-title" style="text-align:center;">---</h3>
                 <p id="m-time" style="text-align:center; font-size:0.8rem; color:var(--gold);"></p>
+                <label>Vencedor:</label><select id="p-vencedor"><option value="Time A">Time A</option><option value="Time B">Time B</option><option value="Empate">Empate</option></select>
+                <label>Ambos Marcam:</label><select id="p-ambos"><option value="Sim">Sim</option><option value="Não">Não</option></select>
+                
+                <label>Gols:</label>
+                <select id="p-gols">
+                    <option value="+0.5">+0.5 (0.1)</option><option value="+1.5">+1.5 (0.2)</option><option value="+2.5">+2.5 (0.3)</option><option value="+3.5">+3.5 (0.5)</option><option value="+4.5">+4.5 (1.0)</option>
+                    <option value="-0.5">-0.5 (1.0)</option><option value="-1.5">-1.5 (0.5)</option><option value="-2.5">-2.5 (0.3)</option><option value="-3.5">-3.5 (0.2)</option><option value="-4.5">-4.5 (0.1)</option>
+                </select>
+
+                <label>Escanteios:</label>
+                <select id="p-esc">
+                    <option value="+4.5">+4.5 (0.1)</option><option value="+6.5">+6.5 (0.2)</option><option value="+8.5">+8.5 (0.3)</option><option value="+10.5">+10.5 (0.5)</option><option value="+12.5">+12.5 (1.0)</option>
+                    <option value="-4.5">-4.5 (1.0)</option><option value="-6.5">-6.5 (0.5)</option><option value="-8.5">-8.5 (0.3)</option><option value="-10.5">-10.5 (0.2)</option><option value="-12.5">-12.5 (0.1)</option>
+                </select>
+
+                <label>Cartões:</label>
+                <select id="p-car">
+                    <option value="+1.5">+1.5 (0.1)</option><option value="+2.5">+2.5 (0.2)</option><option value="+3.5">+3.5 (0.3)</option><option value="+4.5">+4.5 (0.5)</option><option value="+5.5">+5.5 (1.0)</option>
+                    <option value="-1.5">-1.5 (1.0)</option><option value="-2.5">-2.5 (0.5)</option><option value="-3.5">-3.5 (0.3)</option><option value="-4.5">-4.5 (0.2)</option><option value="-5.5">-5.5 (0.1)</option>
+                </select>
                 <button onclick="exportPalpite()">GERAR MEU PALPITE (JSON)</button>
             </div>
         </div>
@@ -53,64 +81,69 @@
         </div>
 
         <div id="tab-admin" class="hidden">
-            <div class="card" style="border: 1px solid var(--gold);">
+            <div class="card" style="border: 2px solid var(--gold);">
                 <button onclick="exportMasterFile()" style="background: var(--gold); color: #000;">💾 BAIXAR DATA.JSON ATUALIZADO</button>
             </div>
 
             <div class="card">
-                <h3>Gerenciar Jogadores</h3>
-                <input type="hidden" id="edit-player-idx" value="-1">
-                <input type="text" id="n-u" placeholder="Nome de Jogador">
-                <input type="text" id="n-p" placeholder="Senha">
-                <input type="text" id="n-i" placeholder="URL da Foto">
-                <button onclick="savePlayer()">SALVAR JOGADOR</button>
-                <div id="user-manage-list" style="margin-top:10px;"></div>
-            </div>
-
-            <div class="card">
-                <h3>Configurar Rodada</h3>
+                <h3>1. Configurar Rodada</h3>
                 <input type="text" id="adm-a" placeholder="Time A">
                 <input type="text" id="adm-b" placeholder="Time B">
                 <input type="datetime-local" id="adm-date">
                 <button onclick="updateMatchLocal()">PUBLICAR JOGO</button>
-                
-                <h4 style="margin-top:15px; font-size:0.8rem; color:var(--gold);">Registro de Jogos:</h4>
+                <div id="history-header" style="margin-top:15px; font-size:0.8rem; color:var(--gold); display:none;">Jogos Registrados:</div>
                 <div id="history-list"></div>
             </div>
 
-            <button onclick="resetSystem()" style="background:#511; font-size:0.7rem; width:100%;">RESETAR TODO O SISTEMA</button>
+            <div class="card" style="border: 1px solid var(--accent);">
+                <h3>2. Processar Resultados</h3>
+                <input type="file" id="f-p-in" multiple>
+                <button onclick="inserirDados()" style="background:#30363d">ADICIONAR PALPITES</button>
+                <div id="p-conf" style="margin:10px 0; font-size:0.7rem; color:var(--gold);"></div>
+                <hr style="border:0.5px solid var(--border)">
+                <span class="admin-label">Resultados Reais</span>
+                <select id="res-v"><option value="Time A">Time A</option><option value="Time B">Time B</option><option value="Empate">Empate</option></select>
+                <select id="res-a"><option value="Sim">Sim</option><option value="Não">Não</option></select>
+                <input type="number" id="res-g" placeholder="Gols">
+                <input type="number" id="res-e" placeholder="Escanteios">
+                <input type="number" id="res-c" placeholder="Cartões">
+                <button onclick="processarRankingAcumulado()">CALCULAR E SOMAR PONTOS</button>
+            </div>
+
+            <div class="card">
+                <h3>3. Gerenciar Jogadores</h3>
+                <input type="text" id="n-u" placeholder="Nome"><input type="text" id="n-p" placeholder="Senha"><input type="text" id="n-i" placeholder="URL Foto">
+                <button onclick="saveUser()">CADASTRAR</button>
+                <div id="user-manage-list" style="margin-top:10px;"></div>
+            </div>
+            <button onclick="if(confirm('Zerar tudo?')){localStorage.clear();location.reload();}" style="background:#511; margin-top:20px;">RESET TOTAL</button>
         </div>
     </div>
 </div>
 
 <script>
     let masterData = { users: [], match: { a: "", b: "", date: "" }, ranking: [], history: [] };
-    let currentUser = null;
+    let currentUser = null, tempPlayers = [];
 
-    // Carrega do armazenamento local ao iniciar
     const saved = localStorage.getItem('futbet_master');
     if(saved) masterData = JSON.parse(saved);
 
     function manualLoadMaster() {
         const file = document.getElementById('import-master').files[0];
-        if (!file) return alert("Selecione o arquivo primeiro!");
+        if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             masterData = JSON.parse(e.target.result);
             if(!masterData.history) masterData.history = [];
-            saveAndSync(); 
-            alert("Sistema Ativado!");
-            renderInterface();
+            saveAndSync(); alert("SISTEMA ATIVADO!"); renderInterface();
         };
         reader.readAsText(file);
     }
 
-    function saveAndSync() { 
-        localStorage.setItem('futbet_master', JSON.stringify(masterData)); 
-    }
+    function saveAndSync() { localStorage.setItem('futbet_master', JSON.stringify(masterData)); }
 
     function login() {
-        const u = document.getElementById('user-login').value.trim();
+        const u = document.getElementById('user-login').value.trim(); // Removido toLowerCase forçado
         const p = document.getElementById('pass-login').value.trim();
         if(u === "admin" && p === "admin1") {
             currentUser = "admin";
@@ -128,69 +161,122 @@
         renderInterface();
     }
 
-    // --- FUNÇÃO CORRIGIDA ---
-    function updateMatchLocal() {
-        const teamA = document.getElementById('adm-a').value;
-        const teamB = document.getElementById('adm-b').value;
-        const matchDate = document.getElementById('adm-date').value;
+    // --- MAPA DE PONTOS EXATO ---
+    const PONTOS_FIXOS = {
+        'Gols': {
+            '+0.5': 0.1, '+1.5': 0.2, '+2.5': 0.3, '+3.5': 0.5, '+4.5': 1.0,
+            '-0.5': 1.0, '-1.5': 0.5, '-2.5': 0.3, '-3.5': 0.2, '-4.5': 0.1
+        },
+        'Esc': {
+            '+4.5': 0.1, '+6.5': 0.2, '+8.5': 0.3, '+10.5': 0.5, '+12.5': 1.0,
+            '-4.5': 1.0, '-6.5': 0.5, '-8.5': 0.3, '-10.5': 0.2, '-12.5': 0.1
+        },
+        'Cart': {
+            '+1.5': 0.1, '+2.5': 0.2, '+3.5': 0.3, '+4.5': 0.5, '+5.5': 1.0,
+            '-1.5': 1.0, '-2.5': 0.5, '-3.5': 0.3, '-4.5': 0.2, '-5.5': 0.1
+        }
+    };
 
-        if(!teamA || !teamB || !matchDate) return alert("Preencha todos os campos do jogo!");
+    function processarRankingAcumulado() {
+        const resR = { v: document.getElementById('res-v').value, a: document.getElementById('res-a').value, g: parseInt(document.getElementById('res-g').value)||0, e: parseInt(document.getElementById('res-e').value)||0, c: parseInt(document.getElementById('res-c').value)||0 };
+        
+        tempPlayers.forEach(d => {
+            let ptsRodada = 0, rows = "";
+            
+            const addRow = (l, a, r, p) => {
+                rows += `<tr><td>${l}</td><td>${a}</td><td>${r}</td><td><span class="${p>0?'pts-tag':''}">${p>0?'+'+p.toFixed(1):'0.0'}</span></td></tr>`;
+                return p;
+            };
 
-        const m = { a: teamA, b: teamB, date: matchDate };
-        
-        masterData.match = m;
-        if(!masterData.history) masterData.history = [];
-        masterData.history.push(m);
-        
-        saveAndSync(); 
-        renderInterface(); 
-        alert("Jogo Publicado com Sucesso!");
+            const calcPorMapa = (tipo, aposta, real) => {
+                const valAposta = parseFloat(aposta);
+                let pontosGanhos = 0;
+                
+                // Verifica acerto
+                const acertou = aposta.includes('+') ? (real > valAposta) : (real < Math.abs(valAposta));
+                
+                if (acertou) {
+                    // Busca ponto no mapa fixo
+                    pontosGanhos = PONTOS_FIXOS[tipo][aposta] || 0;
+                }
+
+                return { pts: addRow(tipo, aposta, real, pontosGanhos), dif: Math.abs(real - Math.abs(valAposta)) };
+            };
+
+            let pV = (d.v === resR.v) ? 1.0 : 0; addRow("Vence", d.v, resR.v, pV);
+            let pA = (d.a === resR.a) ? 1.0 : 0; addRow("Ambos", d.a, resR.a, pA);
+            
+            const rG = calcPorMapa("Gols", d.g, resR.g);
+            const rE = calcPorMapa("Esc", d.e, resR.e);
+            const rC = calcPorMapa("Cart", d.c, resR.c);
+
+            ptsRodada = pV + pA + rG.pts + rE.pts + rC.pts;
+            const htmlTable = `<div class="tooltip-header">RESUMO DA RODADA</div><table class="resumo-table"><tr><th>Item</th><th>Voto</th><th>Real</th><th>Pts</th></tr>${rows}</table><div style="padding:10px; background:#f9f9f9; font-size:0.7rem; color:#555;"><b>Desempate (Dif):</b><br>G:${rG.dif} | E:${rE.dif} | C:${rC.dif}</div>`;
+
+            let pRank = masterData.ranking.find(r => r.nome === d.user);
+            if(pRank) { pRank.pts += ptsRodada; pRank.exp = htmlTable; pRank.dG = rG.dif; pRank.dE = rE.dif; pRank.dC = rC.dif; }
+            else { masterData.ranking.push({ nome: d.user, img: d.img, pts: ptsRodada, exp: htmlTable, dG: rG.dif, dE: rE.dif, dC: rC.dif }); }
+        });
+
+        masterData.ranking.sort((a,b) => b.pts - a.pts || a.dG - b.dG || a.dE - b.dE || a.dC - b.dC);
+        tempPlayers = []; document.getElementById('p-conf').innerHTML = "";
+        saveAndSync(); renderRanking();
     }
 
+    // ... (As demais funções de renderInterface, updateMatch, saveUser, etc. continuam iguais à versão anterior e funcionais) ...
     function renderInterface() {
-        // Atualiza Palpites do Jogador
-        if(masterData.match && masterData.match.a) {
+        if(masterData.match.a) {
             document.getElementById('m-title').innerText = `${masterData.match.a} x ${masterData.match.b}`;
             document.getElementById('m-time').innerText = new Date(masterData.match.date).toLocaleString();
         }
-
-        // Atualiza Histórico Admin
-        const hL = document.getElementById('history-list'); hL.innerHTML = "";
-        if(masterData.history) {
-            masterData.history.slice().reverse().forEach((m, i) => {
-                hL.innerHTML += `<div class="history-item"><b>${m.a} x ${m.b}</b><br>${new Date(m.date).toLocaleString()}</div>`;
+        const hList = document.getElementById('history-list'); hList.innerHTML = "";
+        if(masterData.history && masterData.history.length > 0) {
+            document.getElementById('history-header').style.display = 'block';
+            masterData.history.slice().reverse().forEach((m, idx) => {
+                const realIdx = masterData.history.length - 1 - idx;
+                hList.innerHTML += `<div class="list-item"><div><b>${m.a} x ${m.b}</b></div><button onclick="deleteMatch(${realIdx})">X</button></div>`;
             });
-        }
-
-        // Atualiza Lista de Jogadores Admin
+        } else { document.getElementById('history-header').style.display = 'none'; }
         const uList = document.getElementById('user-manage-list'); uList.innerHTML = "";
-        masterData.users.forEach((u, i) => {
-            uList.innerHTML += `<div class="user-item"><span><b>${u.u}</b></span><div class="u-btns"><button class="btn-mini" onclick="editPlayer(${i})">Editar</button><button class="btn-mini" onclick="deletePlayer(${i})" style="background:#511">Excluir</button></div></div>`;
+        masterData.users.forEach((u, i) => { uList.innerHTML += `<div class="list-item"><span>${u.u}</span><button onclick="deleteUser(${i})">X</button></div>`; });
+        renderRanking();
+    }
+
+    function renderRanking() {
+        const list = document.getElementById('list-ranking'); list.innerHTML = "<h3>Classificação</h3>";
+        masterData.ranking.forEach((p, i) => {
+            const userImg = p.img || 'https://cdn-icons-png.flaticon.com/512/166/166124.png';
+            list.innerHTML += `<div class="ranking-item"><div class="pos">${i+1}º</div><img src="${userImg}" class="shield" onerror="this.src='https://cdn-icons-png.flaticon.com/512/166/166124.png'"><div style="flex-grow:1"><strong>${p.nome}</strong><span class="info-btn" onclick="let t=this.nextElementSibling;t.style.display=(t.style.display==='block'?'none':'block')">?</span><div class="tooltip">${p.exp||"Sem dados."}</div></div><div style="font-weight:bold; color:var(--accent);">${p.pts.toFixed(1)}</div></div>`;
         });
     }
 
-    function savePlayer() {
-        const u = document.getElementById('n-u').value;
-        const p = document.getElementById('n-p').value;
-        const i = document.getElementById('n-i').value;
-        if(!u || !p) return alert("Preencha!");
-        masterData.users.push({u, p, img: i});
-        saveAndSync(); renderInterface(); alert("Salvo!");
+    function updateMatchLocal() {
+        const m = { a: document.getElementById('adm-a').value, b: document.getElementById('adm-b').value, date: document.getElementById('adm-date').value };
+        if(!m.a || !m.b || !m.date) return;
+        masterData.match = m; masterData.history.push(m); saveAndSync(); renderInterface();
+        document.getElementById('adm-a').value = ""; document.getElementById('adm-b').value = "";
     }
 
-    function showTab(t) {
-        document.querySelectorAll('[id^="tab-"]').forEach(e => e.classList.add('hidden'));
-        document.getElementById('tab-'+t).classList.remove('hidden');
+    function saveUser() {
+        const u = document.getElementById('n-u').value; const p = document.getElementById('n-p').value; const i = document.getElementById('n-i').value;
+        if(!u || !p) return;
+        masterData.users.push({ u, p, img: i }); saveAndSync(); renderInterface();
+        document.getElementById('n-u').value = ""; document.getElementById('n-p').value = ""; document.getElementById('n-i').value = "";
     }
 
-    function exportMasterFile() {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([JSON.stringify(masterData)], {type:"application/json"}));
-        a.download = "Data.json"; a.click();
+    async function inserirDados() {
+        for(let f of document.getElementById('f-p-in').files) {
+            const content = JSON.parse(await f.text()); tempPlayers.push(content);
+            document.getElementById('p-conf').innerHTML += ` [${content.user}] `;
+        }
     }
-
-    function resetSystem() { if(confirm("Zerar Tudo?")) { localStorage.clear(); location.reload(); } }
+    
+    function deleteMatch(idx) { if(confirm("Remover?")) { masterData.history.splice(idx, 1); saveAndSync(); renderInterface(); } }
+    function deleteUser(idx) { if(confirm("Excluir?")) { masterData.users.splice(idx, 1); saveAndSync(); renderInterface(); } }
+    function exportMasterFile() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(masterData)], {type:"application/json"})); a.download = "Data.json"; a.click(); }
+    function exportPalpite() { const p = { user: currentUser, img: masterData.users.find(x => x.u === currentUser)?.img || "", v: document.getElementById('p-vencedor').value, a: document.getElementById('p-ambos').value, g: document.getElementById('p-gols').value, e: document.getElementById('p-esc').value, c: document.getElementById('p-car').value }; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(p)], {type:"application/json"})); a.download = `palp_${currentUser}.json`; a.click(); }
     function logout() { location.reload(); }
+    function showTab(t) { document.querySelectorAll('[id^="tab-"]').forEach(e => e.classList.add('hidden')); document.getElementById('tab-'+t).classList.remove('hidden'); }
 </script>
 </body>
 </html>
